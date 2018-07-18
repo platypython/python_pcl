@@ -17,7 +17,6 @@ RUN git clone https://github.com/strawlab/python-pcl.git && pip3.6 install --upg
 RUN cd /python-pcl && python3.6 setup.py build_ext -i && \
     python3.6 setup.py install --user
 
-WORKDIR /
 ENV OPENCV_VERSION="3.4.1"
 RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
 && unzip ${OPENCV_VERSION}.zip \
