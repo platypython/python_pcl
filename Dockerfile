@@ -4,25 +4,27 @@ RUN apt-get update && apt-get dist-upgrade -y && \
     apt-get install build-essential cmake devscripts dh-exec doxygen doxygen-latex freeglut3-dev git \
     libavformat-dev libjasper-dev libjpeg-dev libopencv-dev libpcl-* libpng-dev \
     libpq-dev libqt4-opengl-dev libswscale-dev libtbb-dev libtbb2 libtiff-dev libusb-1.0-0-dev \
-    libvtk6-qt-dev libxmu-dev pkg-config qt5-default software-properties-common unzip vim wget yasm -y && \
+    libvtk6-qt-dev libxmu-dev pkg-config qt5-default software-properties-common unzip vim wget yasm --no-install-recommends -y && \
     #
     add-apt-repository ppa:jonathonf/python-3.6 && apt-get update && \
     apt-get install python3.6 python3.6-dev python3-pip python-sphinx python3.6-venv -y && \
     rm -rf /var/lib/apt/lists/* && \
+    ln -s /usr/bin/python3.6 /usr/bin/python3 -f && \
     python3.6 -m pip install pip --upgrade && python3.6 -m pip install wheel
 
 #install python-pcl from its git repository
 RUN git clone https://github.com/strawlab/python-pcl.git && pip3.6 install --upgrade pip && \
     pip3.6 install cython==0.25.2 && pip3.6 install numpy
 RUN cd /python-pcl && python3.6 setup.py build_ext -i && \
-    python3.6 setup.py install --user
+    python3.6 setup.py install
 
-ENV OPENCV_VERSION="3.4.1"
+ENV OPENCV_VERSION="3.4.2"
 RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
 && unzip ${OPENCV_VERSION}.zip \
 && mkdir /opencv-${OPENCV_VERSION}/cmake_binary \
 && cd /opencv-${OPENCV_VERSION}/cmake_binary \
-&& cmake -DBUILD_TIFF=ON \
+&& cmake -j$(cat /proc/cpuinfo | grep 'cpu cores' | wc -l) \
+  -DBUILD_TIFF=ON \
   -DBUILD_opencv_java=OFF \
   -DWITH_CUDA=OFF \
   -DENABLE_AVX=ON \
